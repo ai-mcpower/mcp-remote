@@ -449,16 +449,7 @@ describe('Feature: Command Line Arguments Parsing', () => {
 
   it('Scenario: Parse server name with other arguments', async () => {
     // Given command line arguments with server name and other flags
-    const args = [
-      'https://example.com/sse',
-      '3000',
-      '--server-name',
-      'Slack',
-      '--host',
-      'localhost',
-      '--transport',
-      'sse-only',
-    ]
+    const args = ['https://example.com/sse', '3000', '--server-name', 'Slack', '--host', 'localhost', '--transport', 'sse-only']
     const usage = 'test usage'
 
     // When parsing the command line arguments
