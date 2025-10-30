@@ -11,6 +11,8 @@ export interface OAuthProviderOptions {
   callbackPort: number
   /** Desired hostname for the OAuth callback server */
   host: string
+  /** Server name for branded callback path (e.g., 'Notion', 'Slack') */
+  serverName: string
   /** Path for the OAuth callback endpoint */
   callbackPath?: string
   /** Directory to store OAuth credentials */

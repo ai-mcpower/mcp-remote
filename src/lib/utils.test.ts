@@ -418,6 +418,59 @@ describe('Feature: Command Line Arguments Parsing', () => {
 
     consoleSpy.mockRestore()
   })
+
+  it('Scenario: Use default server name when not specified', async () => {
+    // Given command line arguments without --server-name flag
+    const args = ['https://example.com/sse']
+    const usage = 'test usage'
+
+    // When parsing the command line arguments
+    const result = await parseCommandLineArgs(args, usage)
+
+    // Then the default server name should be proxied-server
+    expect(result.serverName).toBe('proxied-server')
+  })
+
+  it('Scenario: Parse custom server name', async () => {
+    // Given command line arguments with --server-name flag
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const args = ['https://example.com/sse', '--server-name', 'Notion']
+    const usage = 'test usage'
+
+    // When parsing the command line arguments
+    const result = await parseCommandLineArgs(args, usage)
+
+    // Then the custom server name should be correctly set
+    expect(result.serverName).toBe('Notion')
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Using server name: Notion'))
+
+    consoleSpy.mockRestore()
+  })
+
+  it('Scenario: Parse server name with other arguments', async () => {
+    // Given command line arguments with server name and other flags
+    const args = [
+      'https://example.com/sse',
+      '3000',
+      '--server-name',
+      'Slack',
+      '--host',
+      'localhost',
+      '--transport',
+      'sse-only',
+    ]
+    const usage = 'test usage'
+
+    // When parsing the command line arguments
+    const result = await parseCommandLineArgs(args, usage)
+
+    // Then all arguments should be correctly parsed including server name
+    expect(result.serverUrl).toBe('https://example.com/sse')
+    expect(result.callbackPort).toBe(3000)
+    expect(result.serverName).toBe('Slack')
+    expect(result.host).toBe('localhost')
+    expect(result.transportStrategy).toBe('sse-only')
+  })
 })
 
 describe('Feature: Tool Filtering with Ignore Patterns', () => {
@@ -889,7 +942,7 @@ describe('setupOAuthCallbackServerWithLongPoll', () => {
     const customTimeout = 5000
     const result = setupOAuthCallbackServerWithLongPoll({
       port: 0, // Use any available port
-      path: '/oauth/callback',
+      path: '/MCPower/Notion/oauth/callback',
       events,
       authTimeoutMs: customTimeout,
     })
@@ -904,7 +957,7 @@ describe('setupOAuthCallbackServerWithLongPoll', () => {
   it('should use default timeout when authTimeoutMs is not provided', async () => {
     const result = setupOAuthCallbackServerWithLongPoll({
       port: 0, // Use any available port
-      path: '/oauth/callback',
+      path: '/MCPower/proxied-server/oauth/callback',
       events,
     })
 

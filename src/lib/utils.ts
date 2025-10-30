@@ -726,6 +726,14 @@ export async function parseCommandLineArgs(args: string[], usage: string) {
     }
   }
 
+  // Parse server name
+  let serverName = 'proxied-server' // Default
+  const serverNameIndex = args.indexOf('--server-name')
+  if (serverNameIndex !== -1 && serverNameIndex < args.length - 1) {
+    serverName = args[serverNameIndex + 1]
+    log(`Using server name: ${serverName}`)
+  }
+
   if (!serverUrl) {
     log(usage)
     process.exit(1)
@@ -800,6 +808,7 @@ export async function parseCommandLineArgs(args: string[], usage: string) {
     authorizeResource,
     ignoredTools,
     authTimeoutMs,
+    serverName,
   }
 }
 

@@ -30,6 +30,7 @@ import { createLazyAuthCoordinator } from './lib/coordination'
  */
 async function runClient(
   serverUrl: string,
+  serverName: string,
   callbackPort: number,
   headers: Record<string, string>,
   transportStrategy: TransportStrategy = 'http-first',
@@ -50,9 +51,10 @@ async function runClient(
   // Create the OAuth client provider
   const authProvider = new NodeOAuthClientProvider({
     serverUrl,
+    serverName,
     callbackPort,
     host,
-    clientName: 'MCP CLI Client',
+    clientName: 'MCPower via mcp-remote (client)',
     staticOAuthClientMetadata,
     staticOAuthClientInfo,
   })
@@ -161,9 +163,10 @@ async function runClient(
 // Parse command-line arguments and run the client
 parseCommandLineArgs(process.argv.slice(2), 'Usage: npx tsx client.ts <https://server-url> [callback-port] [--debug]')
   .then(
-    ({ serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo, authTimeoutMs }) => {
+    ({ serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo, authTimeoutMs, serverName }) => {
       return runClient(
         serverUrl,
+        serverName,
         callbackPort,
         headers,
         transportStrategy,

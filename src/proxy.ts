@@ -29,6 +29,7 @@ import { createLazyAuthCoordinator } from './lib/coordination'
  */
 async function runProxy(
   serverUrl: string,
+  serverName: string,
   callbackPort: number,
   headers: Record<string, string>,
   transportStrategy: TransportStrategy = 'http-first',
@@ -51,9 +52,10 @@ async function runProxy(
   // Create the OAuth client provider
   const authProvider = new NodeOAuthClientProvider({
     serverUrl,
+    serverName,
     callbackPort,
     host,
-    clientName: 'MCP CLI Proxy',
+    clientName: 'MCPower via mcp-remote (proxy)',
     staticOAuthClientMetadata,
     staticOAuthClientInfo,
     authorizeResource,
@@ -160,9 +162,11 @@ parseCommandLineArgs(process.argv.slice(2), 'Usage: npx tsx proxy.ts <https://se
       authorizeResource,
       ignoredTools,
       authTimeoutMs,
+      serverName,
     }) => {
       return runProxy(
         serverUrl,
+        serverName,
         callbackPort,
         headers,
         transportStrategy,
