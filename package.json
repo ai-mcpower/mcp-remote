@@ -32,7 +32,8 @@
     "lint-fix": "prettier --check . --write",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "prepare": "pnpm build"
+    "prepare": "pnpm build",
+    "prepublishOnly": "pnpm check && pnpm test:unit && pnpm build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.3",
