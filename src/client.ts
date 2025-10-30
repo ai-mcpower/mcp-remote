@@ -45,8 +45,11 @@ async function runClient(
   // Get the server URL hash for lockfile operations
   const serverUrlHash = getServerUrlHash(serverUrl)
 
+  // Construct the callback path
+  const callbackPath = `/MCPower/${serverName}/oauth/callback`
+
   // Create a lazy auth coordinator
-  const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, events, authTimeoutMs)
+  const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, callbackPath, events, authTimeoutMs)
 
   // Create the OAuth client provider
   const authProvider = new NodeOAuthClientProvider({

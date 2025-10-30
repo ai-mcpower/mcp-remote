@@ -431,11 +431,13 @@ export async function connectToRemoteServer(
 }
 
 /**
- * Sets up an Express server to handle OAuth callbacks
+ * Sets up an Express server to handle OAuth callbacks with long polling support
  * @param options The server options
- * @returns An object with the server, authCode, and waitForAuthCode function
+ * @returns A promise that resolves to an object with the server, authCode, and waitForAuthCode function
  */
-export function setupOAuthCallbackServerWithLongPoll(options: OAuthCallbackServerOptions) {
+export function setupOAuthCallbackServerWithLongPoll(
+  options: OAuthCallbackServerOptions,
+): Promise<{ server: any; authCode: string | null; waitForAuthCode: () => Promise<string>; authCompletedPromise: Promise<string> }> {
   let authCode: string | null = null
   const app = express()
 
@@ -512,24 +514,28 @@ export function setupOAuthCallbackServerWithLongPoll(options: OAuthCallbackServe
     options.events.emit('auth-code-received', code)
   })
 
-  const server = app.listen(options.port, () => {
-    log(`OAuth callback server running at http://127.0.0.1:${options.port}`)
-  })
+  return new Promise((resolve) => {
+    const server = app.listen(options.port, () => {
+      const address = server.address() as any
+      const actualPort = typeof address === 'object' ? address.port : options.port
+      log(`OAuth callback server running at http://127.0.0.1:${actualPort}`)
 
-  const waitForAuthCode = (): Promise<string> => {
-    return new Promise((resolve) => {
-      if (authCode) {
-        resolve(authCode)
-        return
+      const waitForAuthCode = (): Promise<string> => {
+        return new Promise((resolveCode) => {
+          if (authCode) {
+            resolveCode(authCode)
+            return
+          }
+
+          options.events.once('auth-code-received', (code) => {
+            resolveCode(code)
+          })
+        })
       }
 
-      options.events.once('auth-code-received', (code) => {
-        resolve(code)
-      })
+      resolve({ server, authCode, waitForAuthCode, authCompletedPromise })
     })
-  }
-
-  return { server, authCode, waitForAuthCode, authCompletedPromise }
+  })
 }
 
 /**
@@ -537,8 +543,8 @@ export function setupOAuthCallbackServerWithLongPoll(options: OAuthCallbackServe
  * @param options The server options
  * @returns An object with the server, authCode, and waitForAuthCode function
  */
-export function setupOAuthCallbackServer(options: OAuthCallbackServerOptions) {
-  const { server, authCode, waitForAuthCode } = setupOAuthCallbackServerWithLongPoll(options)
+export async function setupOAuthCallbackServer(options: OAuthCallbackServerOptions) {
+  const { server, authCode, waitForAuthCode } = await setupOAuthCallbackServerWithLongPoll(options)
   return { server, authCode, waitForAuthCode }
 }
 

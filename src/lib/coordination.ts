@@ -125,12 +125,14 @@ export async function waitForAuthentication(port: number): Promise<boolean> {
  * Creates a lazy auth coordinator that will only initiate auth when needed
  * @param serverUrlHash The hash of the server URL
  * @param callbackPort The port to use for the callback server
+ * @param callbackPath The path for the OAuth callback endpoint
  * @param events The event emitter to use for signaling
  * @returns An AuthCoordinator object with an initializeAuth method
  */
 export function createLazyAuthCoordinator(
   serverUrlHash: string,
   callbackPort: number,
+  callbackPath: string,
   events: EventEmitter,
   authTimeoutMs: number,
 ): AuthCoordinator {
@@ -145,10 +147,10 @@ export function createLazyAuthCoordinator(
       }
 
       log('Initializing auth coordination on-demand')
-      debugLog('Initializing auth coordination on-demand', { serverUrlHash, callbackPort })
+      debugLog('Initializing auth coordination on-demand', { serverUrlHash, callbackPort, callbackPath })
 
       // Initialize auth using the existing coordinateAuth logic
-      authState = await coordinateAuth(serverUrlHash, callbackPort, events, authTimeoutMs)
+      authState = await coordinateAuth(serverUrlHash, callbackPort, callbackPath, events, authTimeoutMs)
       debugLog('Auth coordination completed', { skipBrowserAuth: authState.skipBrowserAuth })
       return authState
     },
@@ -159,16 +161,18 @@ export function createLazyAuthCoordinator(
  * Coordinates authentication between multiple instances of the client/proxy
  * @param serverUrlHash The hash of the server URL
  * @param callbackPort The port to use for the callback server
+ * @param callbackPath The path for the OAuth callback endpoint
  * @param events The event emitter to use for signaling
  * @returns An object with the server, waitForAuthCode function, and a flag indicating if browser auth can be skipped
  */
 export async function coordinateAuth(
   serverUrlHash: string,
   callbackPort: number,
+  callbackPath: string,
   events: EventEmitter,
   authTimeoutMs: number,
 ): Promise<{ server: Server; waitForAuthCode: () => Promise<string>; skipBrowserAuth: boolean }> {
-  debugLog('Coordinating authentication', { serverUrlHash, callbackPort })
+  debugLog('Coordinating authentication', { serverUrlHash, callbackPort, callbackPath })
 
   // Check for a lockfile (disabled on Windows for the time being)
   const lockData = process.platform === 'win32' ? null : await checkLockfile(serverUrlHash)
@@ -226,10 +230,10 @@ export async function coordinateAuth(
   }
 
   // Create our own lockfile
-  debugLog('Setting up OAuth callback server', { port: callbackPort })
-  const { server, waitForAuthCode, authCompletedPromise } = setupOAuthCallbackServerWithLongPoll({
+  debugLog('Setting up OAuth callback server', { port: callbackPort, path: callbackPath })
+  const { server, waitForAuthCode, authCompletedPromise } = await setupOAuthCallbackServerWithLongPoll({
     port: callbackPort,
-    path: '/oauth/callback',
+    path: callbackPath,
     events,
     authTimeoutMs,
   })
