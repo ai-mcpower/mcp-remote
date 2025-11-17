@@ -47,7 +47,7 @@ async function runProxy(
   const serverUrlHash = getServerUrlHash(serverUrl)
 
   // Construct the callback path
-  const callbackPath = `/MCPower/${serverName}/oauth/callback`
+  const callbackPath = `/Defenter/${serverName}/oauth/callback`
 
   // Create a lazy auth coordinator
   const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, callbackPath, events, authTimeoutMs)
@@ -58,7 +58,7 @@ async function runProxy(
     serverName,
     callbackPort,
     host,
-    clientName: 'MCPower via mcp-remote (proxy)',
+    clientName: 'Defenter via mcp-remote (proxy)',
     staticOAuthClientMetadata,
     staticOAuthClientInfo,
     authorizeResource,
@@ -159,7 +159,7 @@ parseCommandLineArgs(process.argv.slice(2), 'Usage: npx tsx proxy.ts <https://se
       headers,
       transportStrategy,
       host,
-      debug,
+      debug: _debug,
       staticOAuthClientMetadata,
       staticOAuthClientInfo,
       authorizeResource,

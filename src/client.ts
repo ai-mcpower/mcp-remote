@@ -46,7 +46,7 @@ async function runClient(
   const serverUrlHash = getServerUrlHash(serverUrl)
 
   // Construct the callback path
-  const callbackPath = `/MCPower/${serverName}/oauth/callback`
+  const callbackPath = `/Defenter/${serverName}/oauth/callback`
 
   // Create a lazy auth coordinator
   const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, callbackPath, events, authTimeoutMs)
@@ -57,7 +57,7 @@ async function runClient(
     serverName,
     callbackPort,
     host,
-    clientName: 'MCPower via mcp-remote (client)',
+    clientName: 'Defenter via mcp-remote (client)',
     staticOAuthClientMetadata,
     staticOAuthClientInfo,
   })

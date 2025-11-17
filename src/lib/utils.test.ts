@@ -933,7 +933,7 @@ describe('setupOAuthCallbackServerWithLongPoll', () => {
     const customTimeout = 5000
     const result = await setupOAuthCallbackServerWithLongPoll({
       port: 0, // Use any available port
-      path: '/MCPower/Notion/oauth/callback',
+      path: '/Defenter/Notion/oauth/callback',
       events,
       authTimeoutMs: customTimeout,
     })
@@ -948,7 +948,7 @@ describe('setupOAuthCallbackServerWithLongPoll', () => {
   it('should use default timeout when authTimeoutMs is not provided', async () => {
     const result = await setupOAuthCallbackServerWithLongPoll({
       port: 0, // Use any available port
-      path: '/MCPower/proxied-server/oauth/callback',
+      path: '/Defenter/proxied-server/oauth/callback',
       events,
     })
 
